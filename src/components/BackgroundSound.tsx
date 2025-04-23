@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
 interface BackgroundSoundProps {
-  sound: string | null;
+  sounds: string[];
   playing: boolean;
   volume: number;
 }
@@ -14,35 +14,55 @@ const soundMap: Record<string, string> = {
   ambient: '/sounds/796138__ilariio__relaxing-ambient-soundscape-2.mp3',
 };
 
-const BackgroundSound: React.FC<BackgroundSoundProps> = ({ sound, playing, volume }) => {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+const BackgroundSound: React.FC<BackgroundSoundProps> = ({ sounds, playing, volume }) => {
+  const audioMap = useRef<Record<string, HTMLAudioElement>>({});
 
-  // Start/stop audio when sound/playing changes
   useEffect(() => {
-    if (!sound || !playing) return;
-    // Stop previous background audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+    if (!playing) {
+      Object.values(audioMap.current).forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+      audioMap.current = {};
+      return;
     }
-    // Play new background audio
-    const audio = new window.Audio(soundMap[sound] || soundMap['rain']);
-    audio.loop = true;
-    audio.volume = volume;
-    audioRef.current = audio;
-    audio.play();
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
-    };
-  }, [sound, playing]);
+    // play newly selected sounds
+    sounds.forEach(key => {
+      if (!audioMap.current[key]) {
+        const url = soundMap[key] || soundMap['rain'];
+        const audio = new window.Audio(url);
+        audio.loop = true;
+        audio.volume = volume;
+        audio.play();
+        audioMap.current[key] = audio;
+      }
+    });
+    // stop deselected sounds
+    Object.keys(audioMap.current).forEach(key => {
+      if (!sounds.includes(key)) {
+        audioMap.current[key].pause();
+        audioMap.current[key].currentTime = 0;
+        delete audioMap.current[key];
+      }
+    });
+  }, [sounds, playing]);
 
-  // Update volume live
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
+    Object.values(audioMap.current).forEach(audio => {
+      audio.volume = volume;
+    });
   }, [volume]);
+
+  // cleanup on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(audioMap.current).forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+      audioMap.current = {};
+    };
+  }, []);
 
   return null;
 };

@@ -8,7 +8,7 @@ interface Point {
 
 interface NeonCanvasProps {
   color: string;
-  sound: string | null;
+  penWidth: number;
 }
 
 const COLOR_MAP: Record<string, string> = {
@@ -27,13 +27,7 @@ interface Stroke {
   fadeProgress: number;
 }
 
-interface NeonCanvasProps {
-  color: string;
-  sound: string | null;
-  penWidth: number;
-}
-
-const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, sound, penWidth }) => {
+const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentStroke, setCurrentStroke] = useState<Point[]>([]);
@@ -170,7 +164,7 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, sound, penWidth }) => {
 
   // --- Audio Layering Logic ---
   // Use up to 3 concurrent sounds
-  const audioLayers = useRef<{audio: HTMLAudioElement, timeout: NodeJS.Timeout}[]>([]);
+  const audioLayers = useRef<{ audio: HTMLAudioElement; timeout: number }[]>([]);
 
   function playLayeredSound(color: string, dur: number) {
     // Map color to sound file
@@ -193,13 +187,13 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, sound, penWidth }) => {
       audio.pause();
       audio.currentTime = 0;
     }, dur * 1000);
-    audioLayers.current.push({audio, timeout});
+    audioLayers.current.push({ audio, timeout });
   }
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      audioLayers.current.forEach(({audio, timeout}) => {
+      audioLayers.current.forEach(({ audio, timeout }) => {
         audio.pause();
         clearTimeout(timeout);
       });

@@ -18,7 +18,7 @@ const COLORS = [
 
 const App: React.FC = () => {
   const [phase, setPhase] = useState<Phase>('sound-select');
-  const [selectedSound, setSelectedSound] = useState<string | null>(null);
+  const [selectedSounds, setSelectedSounds] = useState<string[]>([]);
   const [selectedColor, setSelectedColor] = useState<string>('neonBlue');
   const [sessionActive, setSessionActive] = useState<boolean>(false);
   const [showSoundMenu, setShowSoundMenu] = useState<boolean>(true);
@@ -43,21 +43,26 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white relative">
-      <BackgroundSound sound={selectedSound} playing={!!selectedSound && phase !== 'sound-select'} volume={bgVolume} />
+      <BackgroundSound sounds={selectedSounds} playing={selectedSounds.length > 0 && phase !== 'sound-select'} volume={bgVolume} />
       <h1 className="text-4xl font-bold mb-8">Sound Sanctuary</h1>
       <SessionTimer active={sessionActive} duration={7 * 60} onEnd={() => setPhase('session-end')} />
       {/* Sound menu at left edge, slides out after selection, returns on edge hover */}
       {phase === 'sound-select' || (phase === 'draw' && showSoundMenu) ? (
         <div
-          className={`fixed top-1/2 left-0 -translate-y-1/2 z-30 transition-transform duration-500 ${phase === 'sound-select' || showSoundMenu ? 'translate-x-0' : '-translate-x-full'}`}
+          className={`fixed top-16 left-4 z-30 transition-transform duration-500 ${phase === 'sound-select' || showSoundMenu ? 'translate-x-0' : '-translate-x-full'}`}
           onMouseLeave={() => phase === 'draw' && setShowSoundMenu(false)}
         >
           <SoundSelection
+            selectedSounds={selectedSounds}
             onSelect={(sound) => {
-              setSelectedSound(sound);
-              setPhase('draw');
-              setShowSoundMenu(false);
-              setSessionActive(true);
+              setSelectedSounds(prev =>
+                prev.includes(sound) ? prev.filter(s => s !== sound) : [...prev, sound]
+              );
+              if (phase === 'sound-select') {
+                setPhase('draw');
+                setShowSoundMenu(false);
+                setSessionActive(true);
+              }
             }}
           />
         </div>
@@ -77,7 +82,7 @@ const App: React.FC = () => {
       )}
       {/* Neon canvas always available during draw phase */}
       {phase === 'draw' && selectedColor && (
-        <NeonCanvas color={selectedColor} sound={selectedSound} penWidth={6 + bgVolume * 12} />
+        <NeonCanvas color={selectedColor} penWidth={6 + bgVolume * 12} />
       )}
       {phase === 'session-end' && (
         <div className="text-2xl mt-6">Session Complete. Thank you for visiting Sound Sanctuary.</div>
