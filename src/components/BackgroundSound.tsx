@@ -8,10 +8,10 @@ interface BackgroundSoundProps {
 
 const soundMap: Record<string, string> = {
   rain: '/sounds/gentle-rain.wav',
-  bowl: '/sounds/gentle-creek.wav',
+  bowl: '/sounds/521549__buddhassoundofsilence__singing-bowl-deep-sound.wav',
   stream: '/sounds/creek-test.wav',
-  ocean: '/sounds/rain-on-leaves.wav',
-  ambient: '/sounds/1982_gentle-rain-on-leaves-with-soft-wind-and-suburban-ambience.wav',
+  ocean: '/sounds/550915__profispiesser__bgsasc-water-beach-ocean-waves-constant-splashing-rocks-many-small-waves-greece-16.wav',
+  ambient: '/sounds/796138__ilariio__relaxing-ambient-soundscape-2.mp3',
 };
 
 const BackgroundSound: React.FC<BackgroundSoundProps> = ({ sound, playing, volume }) => {

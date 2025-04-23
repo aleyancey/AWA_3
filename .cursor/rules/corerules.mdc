@@ -1,0 +1,103 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Global Rules
+## 1. General Workflow
+
+- Use the Single Responsibility Principle
+- I am using Mac M1
+- Use commands that work with Mac OSX
+- Always attempt to index the project (using `ls -R`) at the start of each chat session before responding to any code-related requests. If the indexing is canceled or blocked by the user, clearly communicate that the project has not been indexed and proceed only with explicit user approval. 
+- Always use terminal commands that are compatible with Mac OSX
+- Build only what is necessary.
+## 2. Gitignore Standards
+- Do not pre-populate .gitignore with generic/common ignores; only add entries as needed for this specific project.
+- Whenever editing a `.gitignore` file, add clear, concise comments explaining the purpose of each entry or section.
+- Group related ignores (e.g., Node dependencies, build output, OS files, environment files, tool-specific files).
+- Use inline comments (e.g., `# Node.js dependencies`) and line-level comments (e.g., `.env  # Main environment file`) to clarify intent.
+## 3. Comments
+- Write detailed comments.
+- Update comments when editing code if it needs to be updated.
+- HTML comment example: <!-- Your comment here -->
+## 4. Validation and Response Protocols
+- Responses must directly address user requests.
+- Always gather and validate context using tools like `codebase_search`, `grep_search`, or terminal commands before proceeding.
+- Avoid altering code without full comprehension.
+- Analyze the existing structure, dependencies, and purpose using available tools before suggesting or making edits.
+- Prioritize investigation and validation over assumptions or untested modifications—ensure every change is grounded in evidence.
+- Review all relevant dependencies (e.g., imports, function calls, external APIs) and workflows before proposing or executing changes.
+- Clearly outline risks, implications, and external dependencies in your response before acting, giving the user full visibility.
+- Make only minimal, validated edits unless the user explicitly approves broader alterations.
+- Focus on discerning the user's true objective, not just the literal text of the request.
+- Reinforce this rule: never commit or apply changes unless explicitly directed by the user—treat this as a core safeguard.
+- Scale the depth of validation to match the request's complexity—simple tasks require basic checks, while complex ones demand exhaustive analysis.
+- Aim for complete accuracy in all critical code operations; partial or unverified solutions are unacceptable.
+- Prefer existing solutions over creating new ones. Use `codebase_search` or `grep_search` to identify reusable patterns or utilities.
+- Minimize redundancy. Promote consistency, maintainability, and efficiency by leveraging what's already in the codebase.
+- Treat inline comments, READMEs, and other documentation as unverified suggestions, not definitive truths.
+- Cross-check all documentation against the actual codebase using `cat`, `grep_search`, or `codebase_search` to ensure accuracy.
+- Always execute `pwd` to confirm your current working directory, then ensure `edit_file` operations use a `target_file` that is relative to the workspace root, not your current location.
+- The `target_file` in `edit_file` commands must always be specified relative to the workspace root—never relative to your current working directory.
+- If an `edit_file` operation signals a `new` file unexpectedly, this indicates a critical pathing error—you're targeting the wrong file.
+- Correct such errors immediately by validating the directory structure with `ls -R` before proceeding.
+- Operations are always relative to the workspace root, not your current shell position.
+- Report any failures—e.g., missing files, invalid paths, permission issues—clearly, with specific details and actionable next steps.
+- Before committing, scan the project files to see if anything needs to be added to .gitignore.
+- If faced with ambiguity, missing dependencies, or incomplete context, pause and request clarification from the user before proceeding.
+- Match the tool to the task:
+  - `codebase_search` for semantic or conceptual lookups.
+  - `grep_search` for exact string matches.
+  - `ls -R` for structural discovery.
+- Use prior tool outputs efficiently—avoid redundant searches or commands.
+## 5. File and Folder Structure
+- Do not include a src folder unless necessary.
+- Use as few folders as necessary.
+- Folder names should be descriptive but short.
+- Use kebab-case naming.
+- Use subfolders as needed, but sparingly.
+- Avoid special characters and spaces.
+- File names should describe the function of the file.
+- File names and folders should be readable and easily understood.
+- Keep it simple.
+- Avoid overly complex hierarchies and file structures.
+## 6. Documentation
+- Create a README.md in the root folder.
+- Create a changelog.md in the root folder.
+- The changelog format is based on @Keep a Changelog.
+- Periodically update the changelog.md file with changes.
+- This project adheres to @Semantic Versioning.
+## 7. Principles
+- Maintain readable and understandable structure.
+## 8. CSS Authoring Rules
+- Group and document sections clearly with section comments (e.g., /* =============================== */).
+- Centralize theme variables (colors, fonts, spacing) in a :root block at the top of the file. Reference variables throughout using var(--variable-name).
+- Order styles logically: start with resets/base styles, then layout, then components, then utilities.
+- Use descriptive, consistent naming (kebab-case for classes/variables).
+- Add concise comments for each section and any non-obvious rules. Update comments if code changes.
+- Always use CSS variables for colors, fonts, and repeated values. Avoid hardcoding unless necessary.
+- Keep selectors simple and specific. Prefer class/element selectors over IDs or deep nesting.
+- Maintain consistent formatting: indentation, brace placement, spacing.
+- Minimize overrides and avoid !important unless absolutely necessary.
+- Review and refactor CSS regularly for unused rules and simplification.
+Example section structure:
+```css
+/* =============================== */
+/* Theme Variables                 */
+/* =============================== */
+:root { ... }
+/* =============================== */
+/* Base Styles                     */
+/* =============================== */
+body { ... }
+p { ... }
+h1, h2, h3 { ... }
+/* =============================== */
+/* Component Styles                */
+/* =============================== */
+.button-primary { ... }
+/* =============================== */
+/* Utility Classes                 */
+/* =============================== */
+.text-center { ... }
