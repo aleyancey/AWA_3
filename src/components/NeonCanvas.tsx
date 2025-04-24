@@ -1,9 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
 
+// Point now includes pressure for pressure-sensitive drawing
 interface Point {
   x: number;
   y: number;
   t: number;
+  pressure: number; // 0 (light) to 1 (full)
 }
 
 interface NeonCanvasProps {
@@ -34,26 +36,30 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
   const [strokes, setStrokes] = useState<Stroke[]>([]);
 
   // Drawing handlers
-  const handlePointerDown = (e: React.PointerEvent) => {
-    setCurrentStroke([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY, t: Date.now() }]);
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const pressure = (e as any).pressure || 1;
+    setCurrentStroke([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY, t: Date.now(), pressure }]);
     setIsDrawing(true);
   };
-  const handlePointerMove = (e: React.PointerEvent) => {
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
-    setCurrentStroke((prev) => [...prev, { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY, t: Date.now() }]);
+    const pressure = (e as any).pressure || 1;
+    setCurrentStroke((prev) => [...prev, { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY, t: Date.now(), pressure }]);
   };
+
   const handlePointerUp = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
     if (currentStroke.length > 1) {
-      // Duration: 1s per 100px of line length, min 2s, max 10s
+      // Duration: 2s per 100px of line length, min 10s, max 30s
       let len = 0;
       for (let i = 1; i < currentStroke.length; i++) {
         const dx = currentStroke[i].x - currentStroke[i - 1].x;
         const dy = currentStroke[i].y - currentStroke[i - 1].y;
         len += Math.sqrt(dx * dx + dy * dy);
       }
-      const dur = Math.max(2, Math.min(10, Math.floor(len / 100)));
+      const dur = Math.max(10, Math.min(30, Math.floor(len / 50)));
       // Add new stroke
       setStrokes((prev) => [
         ...prev.slice(-2), // keep only last 2 so new makes 3 max
@@ -69,7 +75,6 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
     }
     setCurrentStroke([]);
   };
-
 
   // Animate line fade for all strokes
   useEffect(() => {
@@ -102,34 +107,41 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Draw finished strokes
-    // Swarm of organically moving glowing specks effect
-    const now = Date.now();
+    // Draw finished strokes as smooth, pressure-sensitive lines
     strokes.forEach((stroke) => {
       if (stroke.points.length < 2) return;
       const neon = COLOR_MAP[stroke.color] || '#fff';
       const N = stroke.points.length;
       const fadedIdx = Math.floor(N * stroke.fadeProgress);
-      for (let i = fadedIdx; i < N; i++) {
+      ctx.save();
+      ctx.shadowColor = neon;
+      ctx.shadowBlur = 16;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      for (let i = fadedIdx; i < N - 1; i++) {
         const pt = stroke.points[i];
-        // Organic movement: oscillate based on time, index, and path
-        const t = now / 400 + i * 0.2;
-        const jitterMag = 2 + Math.sin(t) * 2 + Math.cos(i + t) * 1.5;
-        const angle = Math.sin(i * 0.3 + t) * Math.PI * 2;
-        const x = pt.x + Math.cos(angle) * jitterMag;
-        const y = pt.y + Math.sin(angle) * jitterMag;
+        const nextPt = stroke.points[i + 1];
+        ctx.moveTo(pt.x, pt.y);
+        ctx.lineTo(nextPt.x, nextPt.y);
+      }
+      // Use pressure for thickness (average of segment)
+      for (let i = fadedIdx; i < N - 1; i++) {
+        const pt = stroke.points[i];
+        const nextPt = stroke.points[i + 1];
         ctx.save();
+        ctx.strokeStyle = neon;
         ctx.globalAlpha = 1 - stroke.fadeProgress * ((i - fadedIdx) / (N - fadedIdx));
-        ctx.shadowColor = neon;
-        ctx.shadowBlur = 16;
+        ctx.lineWidth = penWidth * ((pt.pressure + nextPt.pressure) / 2);
         ctx.beginPath();
-        ctx.arc(x, y, penWidth, 0, 2 * Math.PI);
-        ctx.fillStyle = neon;
-        ctx.fill();
+        ctx.moveTo(pt.x, pt.y);
+        ctx.lineTo(nextPt.x, nextPt.y);
+        ctx.stroke();
         ctx.restore();
       }
+      ctx.restore();
     });
-    // Draw current stroke in progress
+    // Draw current stroke in progress (pressure-sensitive)
     if (isDrawing && currentStroke.length > 1) {
       const neon = COLOR_MAP[color] || '#fff';
       ctx.save();
@@ -137,14 +149,16 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
       ctx.shadowBlur = 16;
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
-      ctx.lineWidth = 8;
-      ctx.strokeStyle = neon;
-      ctx.beginPath();
-      ctx.moveTo(currentStroke[0].x, currentStroke[0].y);
-      for (let i = 1; i < currentStroke.length; i++) {
-        ctx.lineTo(currentStroke[i].x, currentStroke[i].y);
+      for (let i = 0; i < currentStroke.length - 1; i++) {
+        const pt = currentStroke[i];
+        const nextPt = currentStroke[i + 1];
+        ctx.strokeStyle = neon;
+        ctx.lineWidth = penWidth * ((pt.pressure + nextPt.pressure) / 2);
+        ctx.beginPath();
+        ctx.moveTo(pt.x, pt.y);
+        ctx.lineTo(nextPt.x, nextPt.y);
+        ctx.stroke();
       }
-      ctx.stroke();
       ctx.restore();
     }
   }, [strokes, isDrawing, currentStroke, color]);
@@ -178,16 +192,64 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
 
     const soundUrl = colorSoundMap[color] || '/sounds/gentle-rain.wav';
 
-    const audio = new window.Audio(soundUrl);
-    audio.volume = 0.7;
-    audio.currentTime = 0;
-    audio.play();
-    // Stop audio after dur seconds
-    const timeout = setTimeout(() => {
-      audio.pause();
-      audio.currentTime = 0;
-    }, dur * 1000);
-    audioLayers.current.push({ audio, timeout });
+    // --- Web Audio API approach for normalization ---
+    // This loads the audio, analyzes RMS, and adjusts gain so all sounds play at a consistent loudness
+    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    let source: AudioBufferSourceNode;
+    let gainNode: GainNode;
+    let fadeTimeout: number;
+    let cleanupTimeout: number;
+
+    fetch(soundUrl)
+      .then(res => res.arrayBuffer())
+      .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+      .then(buffer => {
+        // Calculate RMS (root mean square) for normalization
+        let sum = 0;
+        const channelData = buffer.getChannelData(0);
+        for (let i = 0; i < channelData.length; i++) {
+          sum += channelData[i] ** 2;
+        }
+        const rms = Math.sqrt(sum / channelData.length);
+        // Target RMS (empirically chosen, tweak as needed)
+        const targetRMS = 0.1;
+        const gainValue = rms > 0 ? targetRMS / rms : 1;
+
+        source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = Math.min(gainValue, 2); // Prevent excessive gain
+        source.connect(gainNode).connect(audioCtx.destination);
+        source.start();
+
+        // Fade-out logic (same as before, but with gain node)
+        const fadeOutDuration = 0.5; // seconds
+        fadeTimeout = window.setTimeout(() => {
+          const fadeSteps = 20;
+          const fadeStepTime = (fadeOutDuration * 1000) / fadeSteps;
+          let step = 0;
+          const startGain = gainNode.gain.value;
+          const fadeStep = startGain / fadeSteps;
+          const fade = setInterval(() => {
+            if (step < fadeSteps) {
+              gainNode.gain.value = Math.max(0, gainNode.gain.value - fadeStep);
+              step++;
+            } else {
+              clearInterval(fade);
+              source.stop();
+              gainNode.disconnect();
+              audioCtx.close();
+            }
+          }, fadeStepTime);
+        }, dur * 1000 - fadeOutDuration * 1000);
+
+        // Cleanup in case component unmounts
+        cleanupTimeout = window.setTimeout(() => {
+          source.stop();
+          gainNode.disconnect();
+          audioCtx.close();
+        }, dur * 1000 + 2000);
+      });
   }
 
   // Cleanup on unmount
