@@ -9,7 +9,7 @@ interface BackgroundSoundProps {
 // key→URL map
 const soundMap: Record<string, string> = {
   rain: '/sounds/gentle-rain.wav',
-  bowl: '/sounds/521549__buddhassoundofsilence__singing-bowl-deep-sound.wav',
+  bowl: '/sounds/binaural_bowls.mp3',
   stream: '/sounds/creek-test.wav',
   ocean: '/sounds/550915__profispiesser__bgsasc-water-beach-ocean-waves-constant-splashing-rocks-many-small-waves-greece-16.wav',
   ambient: '/sounds/796138__ilariio__relaxing-ambient-soundscape-2.mp3',
