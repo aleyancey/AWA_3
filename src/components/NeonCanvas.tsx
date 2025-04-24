@@ -169,7 +169,7 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
   function playLayeredSound(color: string, dur: number) {
     // Map color to sound file
     const colorSoundMap: Record<string, string> = {
-      neonBlue: '/sounds/gentle-rain.wav', // gentle rain
+      neonBlue: '/sounds/creek-neon-blue.mp3', // voice memo creek
       neonGreen: '/sounds/gentle-creek.wav', // creek in rain forest
       neonPurple: '/sounds/creek-test.wav', // creek test
       neonYellow: '/sounds/rain-on-leaves.wav', // rain on leaves

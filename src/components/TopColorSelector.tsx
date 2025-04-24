@@ -14,7 +14,7 @@ interface TopColorSelectorProps {
 }
 
 const TopColorSelector: React.FC<TopColorSelectorProps> = ({ selectedColor, onSelect }) => (
-  <div className="fixed top-4 left-1/2 -translate-x-1/2 flex gap-6 z-20">
+  <div className="flex gap-6">
     {COLORS.map((color) => (
       <button
         key={color.value}

@@ -6,6 +6,7 @@ interface BackgroundSoundProps {
   volume: number;
 }
 
+// key→URL map
 const soundMap: Record<string, string> = {
   rain: '/sounds/gentle-rain.wav',
   bowl: '/sounds/521549__buddhassoundofsilence__singing-bowl-deep-sound.wav',
@@ -15,54 +16,67 @@ const soundMap: Record<string, string> = {
 };
 
 const BackgroundSound: React.FC<BackgroundSoundProps> = ({ sounds, playing, volume }) => {
-  const audioMap = useRef<Record<string, HTMLAudioElement>>({});
+  const ctxRef = useRef<AudioContext>();
+  const bufferRef = useRef<Record<string, AudioBuffer>>({});
+  const sourceRef = useRef<Record<string, AudioBufferSourceNode>>({});
+  const gainRef = useRef<Record<string, GainNode>>({});
 
+  // Init AudioContext & preload buffers
   useEffect(() => {
+    const ctx = new AudioContext();
+    ctxRef.current = ctx;
+    Object.entries(soundMap).forEach(async ([key, url]) => {
+      const data = await fetch(url).then(r => r.arrayBuffer());
+      bufferRef.current[key] = await ctx.decodeAudioData(data);
+    });
+    return () => {
+      Object.values(sourceRef.current).forEach(src => src.stop());
+      ctx.close();
+    };
+  }, []);
+
+  // Play/stop on sounds & playing changes
+  useEffect(() => {
+    const ctx = ctxRef.current;
+    if (!ctx) return;
+
     if (!playing) {
-      Object.values(audioMap.current).forEach(audio => {
-        audio.pause();
-        audio.currentTime = 0;
-      });
-      audioMap.current = {};
+      // stop all
+      Object.values(sourceRef.current).forEach(src => src.stop());
+      sourceRef.current = {};
+      gainRef.current = {};
       return;
     }
-    // play newly selected sounds
+
+    // Start new
     sounds.forEach(key => {
-      if (!audioMap.current[key]) {
-        const url = soundMap[key] || soundMap['rain'];
-        const audio = new window.Audio(url);
-        audio.loop = true;
-        audio.volume = volume;
-        audio.play();
-        audioMap.current[key] = audio;
+      if (!sourceRef.current[key] && bufferRef.current[key]) {
+        const src = ctx.createBufferSource();
+        src.buffer = bufferRef.current[key];
+        src.loop = true;
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = volume;
+        src.connect(gainNode).connect(ctx.destination);
+        src.start(0);
+        sourceRef.current[key] = src;
+        gainRef.current[key] = gainNode;
       }
     });
-    // stop deselected sounds
-    Object.keys(audioMap.current).forEach(key => {
+
+    // Stop removed
+    Object.keys(sourceRef.current).forEach(key => {
       if (!sounds.includes(key)) {
-        audioMap.current[key].pause();
-        audioMap.current[key].currentTime = 0;
-        delete audioMap.current[key];
+        sourceRef.current[key].stop();
+        delete sourceRef.current[key];
+        delete gainRef.current[key];
       }
     });
   }, [sounds, playing]);
 
+  // Volume updates
   useEffect(() => {
-    Object.values(audioMap.current).forEach(audio => {
-      audio.volume = volume;
-    });
+    Object.values(gainRef.current).forEach(g => (g.gain.value = volume));
   }, [volume]);
-
-  // cleanup on unmount
-  useEffect(() => {
-    return () => {
-      Object.values(audioMap.current).forEach(audio => {
-        audio.pause();
-        audio.currentTime = 0;
-      });
-      audioMap.current = {};
-    };
-  }, []);
 
   return null;
 };

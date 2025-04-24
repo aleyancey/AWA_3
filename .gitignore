@@ -31,5 +31,5 @@ yarn-error.log*
 *.sln
 *.sw? 
 
-# Large original binaural track (trimmed version is tracked)
-/public/sounds/676878__wim__binaural-beats-alpha-to-delta-and-back-mp3.mp3
+# Ignore all background sound assets
+/public/sounds/**
