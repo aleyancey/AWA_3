@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SoundSelection from './components/SoundSelection';
 import NeonCanvas from './components/NeonCanvas';
 import SessionTimer from './components/SessionTimer';
@@ -22,10 +22,11 @@ const App: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState<string>('neonBlue');
   const [sessionActive, setSessionActive] = useState<boolean>(false);
   const [showSoundMenu, setShowSoundMenu] = useState<boolean>(true);
+  const [showTopMenu, setShowTopMenu] = useState<boolean>(true);
   const [bgVolume, setBgVolume] = useState<number>(0.5);
 
   // Show menu if user moves mouse/finger to left edge
-  React.useEffect(() => {
+  useEffect(() => {
     if (phase !== 'draw') return;
     const handleMove = (e: MouseEvent | TouchEvent) => {
       let x = 0;
@@ -38,6 +39,23 @@ const App: React.FC = () => {
     return () => {
       window.removeEventListener('mousemove', handleMove);
       window.removeEventListener('touchstart', handleMove);
+    };
+  }, [phase]);
+
+  // slide top menu in when user hovers near top
+  useEffect(() => {
+    if (phase !== 'draw') return;
+    const handleTopHover = (e: MouseEvent | TouchEvent) => {
+      let y = 0;
+      if ('touches' in e && e.touches.length > 0) y = e.touches[0].clientY;
+      else if ('clientY' in e) y = e.clientY;
+      if (y < 30) setShowTopMenu(true);
+    };
+    window.addEventListener('mousemove', handleTopHover);
+    window.addEventListener('touchstart', handleTopHover);
+    return () => {
+      window.removeEventListener('mousemove', handleTopHover);
+      window.removeEventListener('touchstart', handleTopHover);
     };
   }, [phase]);
 
@@ -61,6 +79,7 @@ const App: React.FC = () => {
               if (phase === 'sound-select') {
                 setPhase('draw');
                 setShowSoundMenu(false);
+                setShowTopMenu(false);  // hide top color selector initially
                 setSessionActive(true);
               }
             }}
@@ -69,10 +88,15 @@ const App: React.FC = () => {
       ) : null}
       {/* Top color selector always available during draw phase */}
       {phase === 'draw' && (
-        <TopColorSelector
-          selectedColor={selectedColor}
-          onSelect={setSelectedColor}
-        />
+        <div
+          className={`top-menu fixed top-0 left-1/2 -translate-x-1/2 z-20 transition-transform duration-500 ${showTopMenu ? 'translate-y-0' : '-translate-y-full'}`}
+          onMouseLeave={() => setShowTopMenu(false)}
+        >
+          <TopColorSelector
+            selectedColor={selectedColor}
+            onSelect={setSelectedColor}
+          />
+        </div>
       )}
       {/* Volume slider for background sound */}
       {phase === 'draw' && (
