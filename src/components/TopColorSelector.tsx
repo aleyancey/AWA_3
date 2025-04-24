@@ -5,7 +5,7 @@ const COLORS = [
   { name: 'Green', value: 'neonGreen', border: '#39ff14' },
   { name: 'Purple', value: 'neonPurple', border: '#a259ff' },
   { name: 'Yellow', value: 'neonYellow', border: '#fff700' },
-  { name: 'Turquoise', value: 'neonTurquoise', border: '#1fffd7' },
+  { name: 'Neon Pink', value: 'neonPink', border: '#FF2079' },
 ];
 
 interface TopColorSelectorProps {

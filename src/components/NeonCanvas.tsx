@@ -16,7 +16,7 @@ const COLOR_MAP: Record<string, string> = {
   neonGreen: '#39ff14',
   neonPurple: '#a259ff',
   neonYellow: '#fff700',
-  neonTurquoise: '#1fffd7',
+  neonPink: '#FF2079', // Updated from neonTurquoise (#1fffd7) to neonPink (#FF2079)
 };
 
 interface Stroke {
@@ -172,8 +172,8 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
       neonBlue: '/sounds/creek-neon-blue.mp3', // voice memo creek
       neonGreen: '/sounds/gentle-creek.wav', // creek in rain forest
       neonPurple: '/sounds/creek-test.wav', // creek test
-      neonYellow: '/sounds/rain-on-leaves.wav', // rain on leaves
-      neonTurquoise: '/sounds/1982_gentle-rain-on-leaves-with-soft-wind-and-suburban-ambience.wav', // suburban ambience
+      neonYellow: '/sounds/singing_bowl.wav', // singing bowl (was rain on leaves)
+      neonPink: '/sounds/wind_chimes_trimmed.wav', // wind chimes (trimmed, starts at 8s)
     };
 
     const soundUrl = colorSoundMap[color] || '/sounds/gentle-rain.wav';

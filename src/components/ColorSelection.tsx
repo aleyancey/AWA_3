@@ -5,7 +5,7 @@ const COLORS = [
   { name: 'Green', value: 'neonGreen' },
   { name: 'Purple', value: 'neonPurple' },
   { name: 'Yellow', value: 'neonYellow' },
-  { name: 'Turquoise', value: 'neonTurquoise' },
+  { name: 'Neon Pink', value: 'neonPink' },
 ];
 
 interface ColorSelectionProps {

@@ -13,7 +13,7 @@ const COLORS = [
   { name: 'Green', value: 'neonGreen' },
   { name: 'Purple', value: 'neonPurple' },
   { name: 'Yellow', value: 'neonYellow' },
-  { name: 'Turquoise', value: 'neonTurquoise' },
+  { name: 'Neon Pink', value: 'neonPink' },
 ];
 
 const App: React.FC = () => {
@@ -88,10 +88,7 @@ const App: React.FC = () => {
       ) : null}
       {/* Top color selector always available during draw phase */}
       {phase === 'draw' && (
-        <div
-          className={`top-menu fixed top-0 left-1/2 -translate-x-1/2 z-20 transition-transform duration-500 ${showTopMenu ? 'translate-y-0' : '-translate-y-full'}`}
-          onMouseLeave={() => setShowTopMenu(false)}
-        >
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-20">
           <TopColorSelector
             selectedColor={selectedColor}
             onSelect={setSelectedColor}
