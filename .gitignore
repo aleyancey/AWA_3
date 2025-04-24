@@ -33,3 +33,6 @@ yarn-error.log*
 
 # Ignore all background sound assets
 /public/sounds/**
+
+# --- Exception: Track the trimmed thunderstorm sample for purple brush
+!/public/sounds/240871__timkahn__thunderstorm-trimmed.wav

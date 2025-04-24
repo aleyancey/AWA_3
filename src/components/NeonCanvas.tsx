@@ -35,22 +35,154 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
   const [currentStroke, setCurrentStroke] = useState<Point[]>([]);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
 
+  // --- Real-time pressure-sensitive sound brush ---
+  // Web Audio API nodes for live brush sound (now layering grains)
+  const brushAudioCtx = useRef<AudioContext | null>(null);
+  // Each grain: {src: AudioBufferSourceNode, gain: GainNode}
+  const brushGrains = useRef<{src: AudioBufferSourceNode, gain: GainNode}[]>([]);
+  const brushStartTime = useRef<number>(0);
+  const brushLastXY = useRef<{x:number,y:number} | null>(null);
+  const puddleTimer = useRef<NodeJS.Timeout | null>(null);
+  const puddleIntensity = useRef<number>(0); // 0..1
+
+  // Preload buffer for brush sound (short loop)
+  const brushBuffer = useRef<AudioBuffer | null>(null);
+  useEffect(() => {
+    // Pick a default sound for brush (can be mapped to color if desired)
+    fetch('/sounds/gentle-creek.wav')
+      .then(r => r.arrayBuffer())
+      .then(buf => {
+        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        ctx.decodeAudioData(buf, decoded => {
+          brushBuffer.current = decoded;
+          ctx.close();
+        });
+      });
+  }, []);
+
+  // Helper: add a new sound grain
+  function addBrushGrain(ctx: AudioContext, offset: number = 0) {
+    if (!brushBuffer.current) return;
+    const src = ctx.createBufferSource();
+    src.buffer = brushBuffer.current;
+    src.loop = true;
+    // Add a small random detune for thickness
+    src.playbackRate.value = 0.98 + Math.random() * 0.04;
+    const gain = ctx.createGain();
+    gain.gain.value = 0.11; // Start low, will be modulated
+    src.connect(gain).connect(ctx.destination);
+    src.start(ctx.currentTime + offset);
+    brushGrains.current.push({src, gain});
+  }
+
+  // Helper: set gain for all grains (for pressure/puddle modulation)
+  function setAllGrainGains(target: number) {
+    brushGrains.current.forEach(({gain}) => {
+      gain.gain.value = target;
+    });
+  }
+
+  // Helper: fade out and stop all grains
+  function stopAllGrains(ctx: AudioContext) {
+    brushGrains.current.forEach(({src, gain}) => {
+      try {
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.25);
+        setTimeout(() => {
+          src.stop();
+          src.disconnect();
+          gain.disconnect();
+        }, 300);
+      } catch {}
+    });
+    brushGrains.current = [];
+  }
+
   // Drawing handlers
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const pressure = (e as any).pressure || 1;
     setCurrentStroke([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY, t: Date.now(), pressure }]);
     setIsDrawing(true);
+
+    // --- Start live brush sound with grains ---
+    if (brushAudioCtx.current) brushAudioCtx.current.close();
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    brushAudioCtx.current = ctx;
+    brushGrains.current = [];
+    // Start with 1 grain
+    addBrushGrain(ctx);
+    brushStartTime.current = Date.now();
+    brushLastXY.current = { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY };
+    puddleIntensity.current = 0;
+    // Start puddle timer (increases intensity if held in place)
+    if (puddleTimer.current) clearInterval(puddleTimer.current);
+    puddleTimer.current = setInterval(() => {
+      if (!isDrawing) return;
+      // If pointer hasn't moved much, increase puddle
+      const last = brushLastXY.current;
+      if (!last) return;
+      const curr = currentStroke[currentStroke.length-1];
+      if (!curr) return;
+      const dx = curr.x - last.x;
+      const dy = curr.y - last.y;
+      if (Math.sqrt(dx*dx+dy*dy) < 4) {
+        puddleIntensity.current = Math.min(1, puddleIntensity.current + 0.02);
+      } else {
+        puddleIntensity.current = Math.max(0, puddleIntensity.current - 0.03);
+        brushLastXY.current = { x: curr.x, y: curr.y };
+      }
+      // --- Add more grains as puddle grows ---
+      // Map puddleIntensity (0..1) to number of grains (1..max)
+      const maxGrains = 6;
+      const targetGrains = 1 + Math.floor(puddleIntensity.current * (maxGrains - 1));
+      while (brushGrains.current.length < targetGrains) {
+        // Add with a slight offset for organic sound
+        addBrushGrain(ctx, Math.random() * 0.05);
+      }
+      while (brushGrains.current.length > targetGrains) {
+        // Remove excess grains
+        const grain = brushGrains.current.pop();
+        if (grain) {
+          try {
+            grain.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+            setTimeout(() => {
+              grain.src.stop();
+              grain.src.disconnect();
+              grain.gain.disconnect();
+            }, 200);
+          } catch {}
+        }
+      }
+      // Set all grain gains based on pressure and puddle
+      const puddleCurve = Math.pow(puddleIntensity.current, 2);
+      const gain = Math.max(0.01, Math.min(0.5, (curr.pressure * 0.2) + (puddleCurve * 0.5)));
+      setAllGrainGains(gain);
+    }, 40);
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
     const pressure = (e as any).pressure || 1;
     setCurrentStroke((prev) => [...prev, { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY, t: Date.now(), pressure }]);
+    // Live update gain to match pressure (applies to all grains)
+    const puddleCurve = Math.pow(puddleIntensity.current, 2);
+    const gain = Math.max(0.01, Math.min(0.5, pressure * 0.2 + puddleCurve * 0.5));
+    setAllGrainGains(gain);
+    // Track last XY for puddle detection
+    brushLastXY.current = { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY };
   };
 
   const handlePointerUp = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
+    if (puddleTimer.current) clearInterval(puddleTimer.current);
+    // Fade out and stop all grains
+    if (brushAudioCtx.current) {
+      stopAllGrains(brushAudioCtx.current);
+      setTimeout(() => {
+        brushAudioCtx.current?.close();
+        brushAudioCtx.current = null;
+      }, 350);
+    }
     if (currentStroke.length > 1) {
       // Duration: 2s per 100px of line length, min 10s, max 30s
       let len = 0;
@@ -74,6 +206,7 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
       playLayeredSound(color, dur);
     }
     setCurrentStroke([]);
+    puddleIntensity.current = 0;
   };
 
   // Animate line fade for all strokes
@@ -185,7 +318,8 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
     const colorSoundMap: Record<string, string> = {
       neonBlue: '/sounds/creek-neon-blue.mp3', // voice memo creek
       neonGreen: '/sounds/gentle-creek.wav', // creek in rain forest
-      neonPurple: '/sounds/creek-test.wav', // creek test
+      // Updated: neonPurple now uses trimmed thunderstorm
+      neonPurple: '/sounds/240871__timkahn__thunderstorm-trimmed.wav',
       neonYellow: '/sounds/singing_bowl.wav', // singing bowl (was rain on leaves)
       neonPink: '/sounds/wind_chimes_trimmed.wav', // wind chimes (trimmed, starts at 8s)
     };
