@@ -11,18 +11,19 @@ const COLORS = [
 interface TopColorSelectorProps {
   selectedColor: string;
   onSelect: (color: string) => void;
+  brush?: 'color' | 'delay'; // for future extensibility
 }
 
-const TopColorSelector: React.FC<TopColorSelectorProps> = ({ selectedColor, onSelect }) => (
+const TopColorSelector: React.FC<TopColorSelectorProps> = ({ selectedColor, onSelect, brush }) => (
   <div className="flex gap-6">
     {COLORS.map((color) => (
       <button
         key={color.value}
-        className={`w-10 h-10 rounded-full border-4 transition-all ${selectedColor === color.value ? 'scale-110 shadow-lg' : ''}`}
+        className={`w-10 h-10 rounded-full border-4 transition-all ${selectedColor === color.value && (!brush || brush === 'color') ? 'scale-110 shadow-lg' : ''}`}
         style={{
           background: `var(--tw-color-${color.value})`,
           borderColor: color.border,
-          boxShadow: selectedColor === color.value ? `0 0 12px 4px ${color.border}` : undefined
+          boxShadow: selectedColor === color.value && (!brush || brush === 'color') ? `0 0 12px 4px ${color.border}` : undefined
         }}
         onClick={() => onSelect(color.value)}
         aria-label={color.name}

@@ -11,6 +11,7 @@ interface Point {
 interface NeonCanvasProps {
   color: string;
   penWidth: number;
+  brush?: 'color' | 'delay'; // 'delay' if the delay brush is active (hold D)
 }
 
 const COLOR_MAP: Record<string, string> = {
@@ -27,9 +28,12 @@ interface Stroke {
   startTime: number;
   duration: number;
   fadeProgress: number;
+  delayedSegments?: boolean[]; // true for segments that were smeared with delay brush
 }
 
-const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
+const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth, brush = 'color' }) => {
+  // brush: 'color' (normal) or 'delay' (delay brush active via shortcut)
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentStroke, setCurrentStroke] = useState<Point[]>([]);
@@ -169,7 +173,69 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
     setAllGrainGains(gain);
     // Track last XY for puddle detection
     brushLastXY.current = { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY };
+
+    // --- Delay brush logic: smear/blur lines if active ---
+    if (brush === 'delay') {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      const pointer = { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY };
+      // Find the nearest segment in any stroke within a threshold
+      setStrokes((prevStrokes) => {
+        return prevStrokes.map((stroke) => {
+          if (stroke.points.length < 2) return stroke;
+          // Find nearest segment
+          let minDist = 9999;
+          let minIdx = -1;
+          for (let i = 0; i < stroke.points.length - 1; i++) {
+            const pt1 = stroke.points[i];
+            const pt2 = stroke.points[i + 1];
+            // Distance from pointer to segment (pt1-pt2)
+            const dist = pointToSegmentDist(pointer, pt1, pt2);
+            if (dist < minDist) {
+              minDist = dist;
+              minIdx = i;
+            }
+          }
+          const THRESH = 18; // px, how close you must be to affect
+          if (minDist < THRESH) {
+            // Smear: move the segment slightly in brush direction
+            const dx = pointer.x - stroke.points[minIdx].x;
+            const dy = pointer.y - stroke.points[minIdx].y;
+            // Only affect if direction is not too wild (avoid jumps)
+            if (Math.abs(dx) < 40 && Math.abs(dy) < 40) {
+              const newPoints = stroke.points.map((pt, idx) => {
+                if (idx === minIdx || idx === minIdx + 1) {
+                  // Move toward pointer, but not all the way
+                  return {
+                    ...pt,
+                    x: pt.x + dx * 0.3,
+                    y: pt.y + dy * 0.3,
+                  };
+                }
+                return pt;
+              });
+              // Mark segment as delayed
+              let delayedSegments = stroke.delayedSegments ? [...stroke.delayedSegments] : new Array(stroke.points.length - 1).fill(false);
+              delayedSegments[minIdx] = true;
+              return { ...stroke, points: newPoints, delayedSegments };
+            }
+          }
+          return stroke;
+        });
+      });
+    }
   };
+
+  // Helper: distance from point to segment
+  function pointToSegmentDist(p: {x:number,y:number}, a: Point, b: Point) {
+    const l2 = (a.x-b.x)**2 + (a.y-b.y)**2;
+    if (l2 === 0) return Math.hypot(p.x-a.x, p.y-a.y);
+    let t = ((p.x-a.x)*(b.x-a.x)+(p.y-a.y)*(b.y-a.y))/l2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(p.x-(a.x+t*(b.x-a.x)), p.y-(a.y+t*(b.y-a.y)));
+  }
 
   const handlePointerUp = () => {
     if (!isDrawing) return;
@@ -263,6 +329,21 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth }) => {
         const pt = stroke.points[i];
         const nextPt = stroke.points[i + 1];
         ctx.save();
+        // If segment is delayed, render with extra glow and brightness
+        if (stroke.delayedSegments && stroke.delayedSegments[i]) {
+          ctx.shadowColor = '#fff'; // white for max glow
+          ctx.shadowBlur = 32;
+          ctx.strokeStyle = neon;
+          ctx.globalAlpha = 0.95;
+          ctx.lineWidth = penWidth * 1.25 * ((pt.pressure + nextPt.pressure) / 2);
+          ctx.beginPath();
+          ctx.moveTo(pt.x, pt.y);
+          ctx.lineTo(nextPt.x, nextPt.y);
+          ctx.stroke();
+        }
+        // Normal segment
+        ctx.shadowColor = neon;
+        ctx.shadowBlur = 16;
         ctx.strokeStyle = neon;
         ctx.globalAlpha = 1 - stroke.fadeProgress * ((i - fadedIdx) / (N - fadedIdx));
         ctx.lineWidth = penWidth * ((pt.pressure + nextPt.pressure) / 2);

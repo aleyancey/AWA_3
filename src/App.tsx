@@ -20,6 +20,28 @@ const App: React.FC = () => {
   const [phase, setPhase] = useState<Phase>('sound-select');
   const [selectedSounds, setSelectedSounds] = useState<string[]>([]);
   const [selectedColor, setSelectedColor] = useState<string>('neonBlue');
+  // Track active brush (color or 'delay'), controlled by keyboard shortcut
+  const [activeBrush, setActiveBrush] = useState<'color' | 'delay'>('color');
+
+  // Keyboard shortcut: hold 'D' to activate delay brush
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === 'd' || e.key === 'D') && activeBrush !== 'delay') {
+        setActiveBrush('delay');
+      }
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if ((e.key === 'd' || e.key === 'D') && activeBrush === 'delay') {
+        setActiveBrush('color');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [activeBrush]);
   const [sessionActive, setSessionActive] = useState<boolean>(false);
   const [showSoundMenu, setShowSoundMenu] = useState<boolean>(true);
   const [showTopMenu, setShowTopMenu] = useState<boolean>(true);
@@ -89,10 +111,24 @@ const App: React.FC = () => {
       {/* Top color selector always available during draw phase */}
       {phase === 'draw' && (
         <div className="fixed top-8 left-1/2 -translate-x-1/2 z-20">
-          <TopColorSelector
-            selectedColor={selectedColor}
-            onSelect={setSelectedColor}
-          />
+          <div className="flex items-center gap-4">
+            <TopColorSelector
+              selectedColor={selectedColor}
+              onSelect={(color) => {
+                setSelectedColor(color);
+                setActiveBrush('color');
+              }}
+            />
+            {/* Delay brush button: now just informational, shows shortcut */}
+            <button
+              className={`px-4 py-2 rounded-full border-2 transition-all text-lg font-semibold select-none bg-black/60 border-purple-400 text-purple-200 opacity-80 cursor-default animate-fade-in`}
+              tabIndex={-1}
+              aria-label="Delay Brush Shortcut"
+              disabled
+            >
+              Delay (hold D)
+            </button>
+          </div>
         </div>
       )}
       {/* Volume slider for background sound */}
@@ -103,7 +139,7 @@ const App: React.FC = () => {
       )}
       {/* Neon canvas always available during draw phase */}
       {phase === 'draw' && selectedColor && (
-        <NeonCanvas color={selectedColor} penWidth={6 + bgVolume * 12} />
+        <NeonCanvas color={selectedColor} penWidth={6 + bgVolume * 12} brush={activeBrush} />
       )}
       {phase === 'session-end' && (
         <div className="text-2xl mt-6">Session Complete. Thank you for visiting Sound Sanctuary.</div>
