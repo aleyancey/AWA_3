@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2025-04-27]
+### Added
+- feat: Visual and audio fade duration now based on total pigment (time × pressure × brush width), not stroke length
+- Fade and sound linger according to pigment amount for more paint-like realism
+- Slowed down fade for more natural, immersive experience
+
+### Changed
+- BREAKING CHANGE: Removes length-based duration logic for fading/sound; all marks now fade and sound according to pigment amount
+
+### Rationale
+- Aligns pigment flow and sound with real painting behavior
+- Prepares for future tuning of brush sensitivity and flow
+
 ## [2025-04-24]
 ### Changed
 - Update color menu and audio mapping; adjust tailwind neon colors

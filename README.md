@@ -6,7 +6,7 @@ Sound Sanctuary is a web browser application designed to help users navigate awa
 - Library of 10 natural sounds
 - Audio layering (up to 3 simultaneous sounds)
 - 5 neon color pen options, each mapped to a sound
-- Touch-responsive neon drawing canvas
+- Touch-responsive neon drawing canvas with pigment-based fade and sound duration (time × pressure × brush width for paint-like realism)
 - 7-minute session timer
 - Dark, modern UI
 
