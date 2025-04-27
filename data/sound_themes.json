@@ -1,0 +1,166 @@
+[
+  {
+    "id": "calm-forest",
+    "name": "Calm Forest",
+    "mood_tags": ["calm", "nature", "relax", "forest"],
+    "description": "Gentle forest ambience with soft wind, birds, and distant water.",
+    "sounds": [
+      {"file": "forest-birds.mp3", "type": "ambient"},
+      {"file": "soft-wind.mp3", "type": "ambient"},
+      {"file": "stream.mp3", "type": "water"}
+    ],
+    "visual_palette": ["#2e5339", "#a3c9a8", "#e9f5db"]
+  },
+  {
+    "id": "ocean-focus",
+    "name": "Ocean Focus",
+    "mood_tags": ["focus", "clarity", "water", "ocean"],
+    "description": "Rolling ocean waves and distant seagulls for a clear, focused mind.",
+    "sounds": [
+      {"file": "ocean-waves.mp3", "type": "water"},
+      {"file": "seagulls.mp3", "type": "ambient"},
+      {"file": "sea-breeze.mp3", "type": "wind"}
+    ],
+    "visual_palette": ["#3a7ca5", "#d9eefa", "#f0f5f9"]
+  },
+  {
+    "id": "sunrise-energy",
+    "name": "Sunrise Energy",
+    "mood_tags": ["energize", "morning", "uplifting"],
+    "description": "Uplifting chimes and soft bells to start your day with energy.",
+    "sounds": [
+      {"file": "chimes.mp3", "type": "percussion"},
+      {"file": "soft-bells.mp3", "type": "percussion"},
+      {"file": "birds-morning.mp3", "type": "ambient"}
+    ],
+    "visual_palette": ["#f9d923", "#ffb4a2", "#ffe5b4"]
+  },
+  {
+    "id": "deep-meditation",
+    "name": "Deep Meditation",
+    "mood_tags": ["meditate", "deep", "peace", "focus"],
+    "description": "Resonant bowls and airy drones for deep meditation and peace.",
+    "sounds": [
+      {"file": "tibetan-bowls.mp3", "type": "instrument"},
+      {"file": "drone.mp3", "type": "ambient"},
+      {"file": "soft-bells.mp3", "type": "percussion"}
+    ],
+    "visual_palette": ["#a7c7e7", "#f4e1d2", "#e2e2e2"]
+  },
+  {
+    "id": "rainy-evening",
+    "name": "Rainy Evening",
+    "mood_tags": ["rain", "cozy", "evening", "calm"],
+    "description": "Soft rain and distant thunder for a cozy, calming atmosphere.",
+    "sounds": [
+      {"file": "soft-rain.mp3", "type": "water"},
+      {"file": "distant-thunder.mp3", "type": "ambient"},
+      {"file": "night-crickets.mp3", "type": "ambient"}
+    ],
+    "visual_palette": ["#4a536b", "#b4c5e4", "#e7ecef"]
+  },
+  {
+    "id": "celestial-drift",
+    "name": "Celestial Drift",
+    "mood_tags": ["dreamy", "expansive", "ethereal"],
+    "description": "Float through the cosmos on gentle currents of starlight.",
+    "sounds": [
+      {"file": "ambient-synth-pad.mp3", "type": "synth"},
+      {"file": "soft-wind.mp3", "type": "ambient"},
+      {"file": "distant-chimes.mp3", "type": "percussion"},
+      {"file": "cosmic-drone.mp3", "type": "drone"},
+      {"file": "echoing-bells.mp3", "type": "percussion"}
+    ]
+  },
+  {
+    "id": "whispering-forest",
+    "name": "Whispering Forest",
+    "mood_tags": ["grounded", "alive", "peaceful"],
+    "description": "Wander a sun-dappled grove where ancient trees hum with life.",
+    "sounds": [
+      {"file": "forest-birds.mp3", "type": "ambient"},
+      {"file": "rustling-leaves.mp3", "type": "ambient"},
+      {"file": "distant-river.mp3", "type": "water"},
+      {"file": "woodpecker-taps.mp3", "type": "percussion"},
+      {"file": "owl-hoot.mp3", "type": "ambient"}
+    ]
+  },
+  {
+    "id": "ocean-beat",
+    "name": "Ocean Beat",
+    "mood_tags": ["calming", "powerful", "steady"],
+    "description": "Feel the eternal rhythm of waves syncing with your breath.",
+    "sounds": [
+      {"file": "deep-ocean-waves.mp3", "type": "water"},
+      {"file": "underwater-currents.mp3", "type": "ambient"},
+      {"file": "whale-song.mp3", "type": "ambient"},
+      {"file": "sea-breeze.mp3", "type": "wind"},
+      {"file": "water-splashes.mp3", "type": "water"}
+    ]
+  },
+  {
+    "id": "sakura-breeze",
+    "name": "Sakura Breeze",
+    "mood_tags": ["fresh", "delicate", "rejuvenating"],
+    "description": "A gentle spring wind carries petals and hope through the air.",
+    "sounds": [
+      {"file": "cherry-blossoms-rustling.mp3", "type": "ambient"},
+      {"file": "koto-strings.mp3", "type": "instrument"},
+      {"file": "bamboo-chimes.mp3", "type": "percussion"},
+      {"file": "soft-flowing-stream.mp3", "type": "water"},
+      {"file": "morning-birds.mp3", "type": "ambient"}
+    ]
+  },
+  {
+    "id": "monsoon-dream",
+    "name": "Monsoon Dream",
+    "mood_tags": ["cleansing", "introspective", "flowing"],
+    "description": "Heavy rain renews the world, washing away yesterday’s weight.",
+    "sounds": [
+      {"file": "heavy-rain.mp3", "type": "water"},
+      {"file": "distant-thunder.mp3", "type": "ambient"},
+      {"file": "temple-bells.mp3", "type": "percussion"},
+      {"file": "chanting.mp3", "type": "vocal"},
+      {"file": "water-runoff.mp3", "type": "water"}
+    ]
+  },
+  {
+    "id": "glacier-drone",
+    "name": "Glacier Drone",
+    "mood_tags": ["crisp", "spacious", "awakening"],
+    "description": "Breathe with the slow, mighty lungs of the ice giants.",
+    "sounds": [
+      {"file": "cracking-ice.mp3", "type": "ambient"},
+      {"file": "icy-wind.mp3", "type": "wind"},
+      {"file": "low-ambient-drone.mp3", "type": "drone"},
+      {"file": "river-ice-flows.mp3", "type": "water"},
+      {"file": "echoing-canyons.mp3", "type": "ambient"}
+    ]
+  },
+  {
+    "id": "river-flow",
+    "name": "River Flow",
+    "mood_tags": ["flowing", "energizing", "uplifting"],
+    "description": "Follow a luminous current toward inspiration and rebirth.",
+    "sounds": [
+      {"file": "gentle-river-flow.mp3", "type": "water"},
+      {"file": "harp-glissando.mp3", "type": "instrument"},
+      {"file": "early-morning-birds.mp3", "type": "ambient"},
+      {"file": "breeze-through-reeds.mp3", "type": "ambient"},
+      {"file": "sparkling-synth-notes.mp3", "type": "synth"}
+    ]
+  },
+  {
+    "id": "aurora",
+    "name": "Aurora",
+    "mood_tags": ["vibrant", "mystical", "awe-inspiring"],
+    "description": "Watch waves of celestial light dance across the frozen sky.",
+    "sounds": [
+      {"file": "shimmering-synths.mp3", "type": "synth"},
+      {"file": "crackling-frost.mp3", "type": "ambient"},
+      {"file": "subtle-choir-pads.mp3", "type": "vocal"},
+      {"file": "light-crackles.mp3", "type": "ambient"},
+      {"file": "cold-wind.mp3", "type": "wind"}
+    ]
+  }
+]
