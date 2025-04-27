@@ -129,7 +129,7 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth, brush = 'color
       const dx = curr.x - last.x;
       const dy = curr.y - last.y;
       if (Math.sqrt(dx*dx+dy*dy) < 4) {
-        puddleIntensity.current = Math.min(1, puddleIntensity.current + 0.02);
+        puddleIntensity.current = Math.min(1, puddleIntensity.current + 0.08);
       } else {
         puddleIntensity.current = Math.max(0, puddleIntensity.current - 0.03);
         brushLastXY.current = { x: curr.x, y: curr.y };
@@ -250,17 +250,20 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth, brush = 'color
       }, 350);
     }
     if (currentStroke.length > 1) {
-      // Duration: 2s per 100px of line length, min 10s, max 30s
-      let len = 0;
+      // New: Duration is based on total pigment (Δt * pressure * penWidth)
+      let totalPigment = 0;
       for (let i = 1; i < currentStroke.length; i++) {
-        const dx = currentStroke[i].x - currentStroke[i - 1].x;
-        const dy = currentStroke[i].y - currentStroke[i - 1].y;
-        len += Math.sqrt(dx * dx + dy * dy);
+        const dt = (currentStroke[i].t - currentStroke[i - 1].t) / 1000; // seconds
+        const avgPressure = (currentStroke[i].pressure + currentStroke[i - 1].pressure) / 2;
+        totalPigment += dt * avgPressure * penWidth;
       }
-      const dur = Math.max(10, Math.min(30, Math.floor(len / 50)));
-      // Add new stroke
+      // Clamp pigment-based duration for UX
+      const minDur = 2; // seconds
+      const maxDur = 30; // seconds
+      // Scale: adjust 0.5 as needed for feel
+      const dur = Math.max(minDur, Math.min(maxDur, totalPigment * 1.5));
       setStrokes((prev) => [
-        ...prev.slice(-2), // keep only last 2 so new makes 3 max
+        ...prev.slice(-2),
         {
           points: currentStroke,
           color,
