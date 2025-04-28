@@ -2,8 +2,8 @@
   {
     "id": "calm-forest",
     "name": "Calm Forest",
-    "mood_tags": ["calm", "nature", "relax", "forest"],
-    "description": "Gentle forest ambience with soft wind, birds, and distant water.",
+    "mood_tags": ["calm", "nature", "relax", "forest", "soothing", "anxiety relief", "stress relief", "peaceful", "serene", "comfort", "anti-anxiety", "anger relief", "soothe anger", "anger management", "emotional regulation"],
+    "description": "Gentle forest ambience with soft wind, birds, and distant water. Perfect for relieving anxiety, stress, anger, and finding calm.",
     "sounds": [
       {"file": "forest-birds.mp3", "type": "ambient"},
       {"file": "soft-wind.mp3", "type": "ambient"},
@@ -50,8 +50,8 @@
   {
     "id": "rainy-evening",
     "name": "Rainy Evening",
-    "mood_tags": ["rain", "cozy", "evening", "calm"],
-    "description": "Soft rain and distant thunder for a cozy, calming atmosphere.",
+    "mood_tags": ["rain", "cozy", "evening", "calm", "soothing", "anxiety relief", "stress relief", "relaxing", "peaceful", "comfort", "anger relief", "soothe anger", "anger management", "emotional regulation"],
+    "description": "Soft rain and distant thunder for a cozy, calming atmosphere. Helps melt away anxiety, anger, and soothe nerves.",
     "sounds": [
       {"file": "soft-rain.mp3", "type": "water"},
       {"file": "distant-thunder.mp3", "type": "ambient"},
@@ -162,5 +162,33 @@
       {"file": "light-crackles.mp3", "type": "ambient"},
       {"file": "cold-wind.mp3", "type": "wind"}
     ]
+  },
+  {
+    "id": "temple-of-stillness",
+    "name": "Temple of Stillness",
+    "mood_tags": ["sacred", "centered", "pure", "stillness", "still", "be still", "quiet", "silence", "tranquil", "quietude", "meditative", "serene", "peaceful", "ritual", "spiritual"],
+    "description": "Step inside a hallowed space where silence speaks volumes. Perfect for meditation, centering, finding inner peace, and embracing stillness, quiet, and calm. Ideal for those seeking silence, to be still, or to experience tranquility and quietude.",
+    "sounds": [
+      {"file": "tibetan-bowls.mp3", "type": "instrument"},
+      {"file": "deep-gong-strikes.mp3", "type": "percussion"},
+      {"file": "soft-chanting.mp3", "type": "vocal"},
+      {"file": "incense-smoke.mp3", "type": "ambient"},
+      {"file": "prayer-drums.mp3", "type": "percussion"}
+    ],
+    "visual_palette": ["#e9e4d4", "#b7a77a", "#7a6c53"]
+  },
+  {
+    "id": "heart-haven",
+    "name": "Heart Haven",
+    "mood_tags": ["love", "loved", "affection", "warmth", "connection", "embrace", "caring", "compassion", "romantic", "gentle"],
+    "description": "A gentle embrace of sound—soft harmonies, warm pads, and delicate melodies to inspire feelings of love, connection, and belonging.",
+    "sounds": [
+      {"file": "gentle-harp.mp3", "type": "instrument"},
+      {"file": "warm-pad.mp3", "type": "synth"},
+      {"file": "soft-choir.mp3", "type": "vocal"},
+      {"file": "subtle-heartbeat.mp3", "type": "ambient"},
+      {"file": "light-chimes.mp3", "type": "percussion"}
+    ],
+    "visual_palette": ["#ffe0e9", "#f9bec7", "#f7cad0"]
   }
 ]
