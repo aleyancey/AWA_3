@@ -59,19 +59,7 @@
     ],
     "visual_palette": ["#4a536b", "#b4c5e4", "#e7ecef"]
   },
-  {
-    "id": "celestial-drift",
-    "name": "Celestial Drift",
-    "mood_tags": ["dreamy", "expansive", "ethereal"],
-    "description": "Float through the cosmos on gentle currents of starlight.",
-    "sounds": [
-      {"file": "ambient-synth-pad.mp3", "type": "synth"},
-      {"file": "soft-wind.mp3", "type": "ambient"},
-      {"file": "distant-chimes.mp3", "type": "percussion"},
-      {"file": "cosmic-drone.mp3", "type": "drone"},
-      {"file": "echoing-bells.mp3", "type": "percussion"}
-    ]
-  },
+
   {
     "id": "whispering-forest",
     "name": "Whispering Forest",
@@ -83,7 +71,8 @@
       {"file": "distant-river.mp3", "type": "water"},
       {"file": "woodpecker-taps.mp3", "type": "percussion"},
       {"file": "owl-hoot.mp3", "type": "ambient"}
-    ]
+    ],
+    "visual_palette": []
   },
   {
     "id": "ocean-beat",
@@ -96,7 +85,22 @@
       {"file": "whale-song.mp3", "type": "ambient"},
       {"file": "sea-breeze.mp3", "type": "wind"},
       {"file": "water-splashes.mp3", "type": "water"}
-    ]
+    ],
+    "visual_palette": []
+  },
+  {
+    "id": "celestial-drift",
+    "name": "Celestial Drift",
+    "mood_tags": ["dreamy", "expansive", "ethereal"],
+    "description": "Float through the cosmos on gentle currents of starlight.",
+    "sounds": [
+      {"file": "ambient-synth-pad.mp3", "type": "synth"},
+      {"file": "soft-wind.mp3", "type": "ambient"},
+      {"file": "distant-chimes.mp3", "type": "percussion"},
+      {"file": "cosmic-drone.mp3", "type": "drone"},
+      {"file": "echoing-bells.mp3", "type": "percussion"}
+    ],
+    "visual_palette": ["#b3c6e7", "#f3f8ff", "#d1e3ff"]
   },
   {
     "id": "sakura-breeze",
@@ -109,7 +113,8 @@
       {"file": "bamboo-chimes.mp3", "type": "percussion"},
       {"file": "soft-flowing-stream.mp3", "type": "water"},
       {"file": "morning-birds.mp3", "type": "ambient"}
-    ]
+    ],
+    "visual_palette": ["#f7dbe6", "#fff0f5", "#ffe5ec"]
   },
   {
     "id": "monsoon-dream",
@@ -122,7 +127,8 @@
       {"file": "temple-bells.mp3", "type": "percussion"},
       {"file": "chanting.mp3", "type": "vocal"},
       {"file": "water-runoff.mp3", "type": "water"}
-    ]
+    ],
+    "visual_palette": ["#7e9ba5", "#bcd4e6", "#eaf6fb"]
   },
   {
     "id": "glacier-drone",
@@ -135,7 +141,8 @@
       {"file": "low-ambient-drone.mp3", "type": "drone"},
       {"file": "river-ice-flows.mp3", "type": "water"},
       {"file": "echoing-canyons.mp3", "type": "ambient"}
-    ]
+    ],
+    "visual_palette": ["#c7e9f1", "#eaf6fb", "#bcd4e6"]
   },
   {
     "id": "river-flow",
@@ -148,7 +155,8 @@
       {"file": "early-morning-birds.mp3", "type": "ambient"},
       {"file": "breeze-through-reeds.mp3", "type": "ambient"},
       {"file": "sparkling-synth-notes.mp3", "type": "synth"}
-    ]
+    ],
+    "visual_palette": ["#b0e0e6", "#e0f7fa", "#f7fafd"]
   },
   {
     "id": "aurora",
@@ -161,7 +169,8 @@
       {"file": "subtle-choir-pads.mp3", "type": "vocal"},
       {"file": "light-crackles.mp3", "type": "ambient"},
       {"file": "cold-wind.mp3", "type": "wind"}
-    ]
+    ],
+    "visual_palette": ["#a2d5f2", "#e7f0fd", "#f7fafc"]
   },
   {
     "id": "temple-of-stillness",

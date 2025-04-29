@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- feat: CLI now supports single-query mode via command-line argument (prints results and exits)
+
+### Fixed
+- fix: Removed duplicate 'celestial-drift' theme from sound_themes.json, ensuring only unique themes are embedded
+
+### Changed
+- CLI script no longer loops indefinitely if a query is provided; interactive mode is preserved as default
+
+### Rationale
+- Enables scripting and automation for embedding/querying sound themes
+- Prevents user confusion and errors from duplicate data or unwanted input loops
 
 ## [2025-04-27]
 ### Added
