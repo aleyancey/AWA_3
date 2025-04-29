@@ -6,15 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Added
-- feat: CLI now supports single-query mode via command-line argument (prints results and exits)
+- feat: Scaffolded minimalist React frontend (`sound-sanctuary-frontend`) for mood-based sound theme discovery.
+  - Dark, organic UI with animated geometric SVG background, Lato font, and animated prompt.
+  - Mood input, flickering tag suggestions, and theme match display.
+  - Integrated with FastAPI backend `/search` endpoint for live theme retrieval.
+
+### Changed
+- Project structure updated to include frontend and backend directories, supporting full-stack development.
 
 ### Fixed
 - fix: Removed duplicate 'celestial-drift' theme from sound_themes.json, ensuring only unique themes are embedded
 
-### Changed
-- CLI script no longer loops indefinitely if a query is provided; interactive mode is preserved as default
-
 ### Rationale
+- Enables modern, intuitive user experience for exploring sound themes by mood.
+- Lays the foundation for future features (sound playback, interactive brush/canvas, etc.).
 - Enables scripting and automation for embedding/querying sound themes
 - Prevents user confusion and errors from duplicate data or unwanted input loops
 
