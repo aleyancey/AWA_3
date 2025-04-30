@@ -14,12 +14,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Implemented smooth fade in/out transitions for mood suggestions
   - Optimized timing for a more soothing user experience
   - Isolated changes to prevent interference with core functionality
+  - Improved suggestion text positioning and alignment for better UX
+  - Fine-tuned vertical alignment of suggestions within input field
 
 ### Changed
 - Project structure updated to include frontend and backend directories, supporting full-stack development.
 
 ### Fixed
 - fix: Removed duplicate 'celestial-drift' theme from sound_themes.json, ensuring only unique themes are embedded
+- fix: Resolved CORS and proxy configuration issues between frontend and backend
+  - Implemented direct API calls to backend endpoint
+  - Added proper CORS headers in FastAPI backend
+  - Fixed theme search functionality
+  - Improved error handling and logging for API requests
 
 ### Rationale
 - Enables modern, intuitive user experience for exploring sound themes by mood.
