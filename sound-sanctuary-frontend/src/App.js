@@ -32,6 +32,7 @@ function App() {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [selectedSuggestion, setSelectedSuggestion] = useState(null);
   
   const suggestionIntervalRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -49,7 +50,7 @@ function App() {
     }
 
     const showNextSuggestion = () => {
-      if (!isTyping && !mood) {
+      if (!isTyping && !mood && !selectedSuggestion) {
         // Start fading out current suggestion
         setIsFadingOut(true);
         
@@ -73,7 +74,7 @@ function App() {
 
     // Start the interval for cycling suggestions
     suggestionIntervalRef.current = setInterval(showNextSuggestion, SUGGESTION_INTERVAL);
-  }, [isTyping, mood, getNextSuggestion]);
+  }, [isTyping, mood, getNextSuggestion, selectedSuggestion]);
 
   const stopSuggestions = useCallback(() => {
     if (suggestionIntervalRef.current) {
@@ -102,26 +103,22 @@ function App() {
   }, [startSuggestions]);
 
   useEffect(() => {
-    if (!isTyping && !mood) {
+    if (!isTyping && !mood && !selectedSuggestion) {
       startSuggestions();
     } else {
       stopSuggestions();
     }
-  }, [isTyping, mood, startSuggestions, stopSuggestions]);
+  }, [isTyping, mood, startSuggestions, stopSuggestions, selectedSuggestion]);
 
   const handleInput = e => {
     const value = e.target.value;
     setMood(value);
+    setSelectedSuggestion(null);
     
     setIsTyping(true);
     
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
-    }
-    
-    // Remove the forced text alignment to allow natural cursor behavior
-    if (inputRef.current) {
-      inputRef.current.style.textAlign = 'left';
     }
     
     typingTimeoutRef.current = setTimeout(() => {
@@ -136,22 +133,27 @@ function App() {
     if (!currentSuggestion) return;
     
     setMood(currentSuggestion);
+    setSelectedSuggestion(currentSuggestion);
     stopSuggestions();
     
-    // Focus input and allow natural cursor behavior
+    // Focus input and position cursor at the end
     if (inputRef.current) {
       inputRef.current.focus();
-      inputRef.current.style.textAlign = 'left';
-      inputRef.current.setSelectionRange(currentSuggestion.length, currentSuggestion.length);
+      // Ensure cursor is at the end of the text
+      const length = currentSuggestion.length;
+      requestAnimationFrame(() => {
+        inputRef.current.setSelectionRange(length, length);
+      });
     }
   };
 
   const handleKeyDown = e => {
     if (e.key === 'Enter') {
-      handleSubmit();
+      handleSubmit(mood);
     } else if (e.key === 'Escape') {
       // Clear input on Escape
       setMood('');
+      setSelectedSuggestion(null);
       if (inputRef.current) {
         inputRef.current.style.textAlign = 'left';
       }
@@ -166,17 +168,59 @@ function App() {
     setError("");
     setLoading(true);
     setThemes([]);
+    
+    const searchQuery = query || mood;
+    console.log("Making search request:", {
+      url: '/search',
+      query: searchQuery,
+      top_k: 5
+    });
+    
     try {
-      const resp = await fetch("/search", {
+      // Make the search request
+      const resp = await fetch("http://localhost:8000/search", {  // Use direct URL to backend
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: query || mood, top_k: 5 })
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ query: searchQuery, top_k: 5 })
       });
-      if (!resp.ok) throw new Error("Server error");
-      const data = await resp.json();
+      
+      console.log("Response headers:", {
+        contentType: resp.headers.get("content-type"),
+        status: resp.status,
+        statusText: resp.statusText
+      });
+      
+      // Get response as text first for debugging
+      const responseText = await resp.text();
+      console.log("Raw response:", responseText);
+      
+      // Try parsing as JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("Failed to parse response as JSON:", parseError);
+        throw new Error("Server response was not valid JSON. Response: " + responseText.substring(0, 100));
+      }
+      
+      if (!resp.ok) {
+        console.error("Error response:", data);
+        throw new Error(data.detail || `Server error: ${resp.status}`);
+      }
+      
+      if (!Array.isArray(data)) {
+        console.error("Invalid data format:", data);
+        throw new Error("Server returned invalid data format");
+      }
+      
+      console.log("Successfully parsed themes:", data);
       setThemes(data);
     } catch (err) {
-      setError("Could not fetch themes. Try again.");
+      console.error("Error in handleSubmit:", err);
+      setError(err.message || "Could not fetch themes. Please check the console for details.");
     } finally {
       setLoading(false);
     }
@@ -199,13 +243,20 @@ function App() {
             onChange={handleInput}
             onKeyDown={handleKeyDown}
             aria-label="Mood input"
-            placeholder=""
+            placeholder=" "
             autoFocus
           />
           {!mood && currentSuggestion && (
             <div 
               className={`suggestion-placeholder ${isFadingOut ? 'next' : 'current'} ${isPaused ? 'paused' : ''}`}
               onClick={handleSuggestionClick}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleSuggestionClick();
+                }
+              }}
             >
               {currentSuggestion}
             </div>
