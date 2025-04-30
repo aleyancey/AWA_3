@@ -106,8 +106,6 @@ body {
   width: 60%;
   max-width: 400px;
   margin: 0 auto 2rem;
-  display: flex;
-  justify-content: center;
 }
 
 /* Input field */
@@ -118,12 +116,11 @@ body {
   color: var(--text-color);
   font-size: 1.5rem;
   padding: 0.5rem 1.5rem;
-  text-align: left;
   width: 100%;
   transition: border-color 0.3s ease;
   position: relative;
-  z-index: 2;
   caret-color: var(--text-color);
+  line-height: 1.5;
 }
 
 .mood-input:focus {
@@ -134,20 +131,17 @@ body {
 /* Suggestion placeholder */
 .suggestion-placeholder {
   position: absolute;
-  width: 100%;
-  text-align: left;
-  top: 0;
-  left: 0;
-  padding: 0.5rem 1.5rem;
-  color: rgba(255,255,255,0.4);
+  left: 1.5rem;
+  color: rgba(255,255,255,0.3);
   font-size: 1.5rem;
-  z-index: 1;
-  pointer-events: auto;
+  pointer-events: all;
   user-select: none;
-  white-space: pre;
-  overflow: visible;
-  transition: opacity 1.5s ease-in-out;
+  transition: opacity 1.5s ease-in-out, color 0.3s ease;
   opacity: 0;
+  cursor: pointer;
+  line-height: 1.5;
+  padding: 0.4rem 0;
+  top: 0.2rem;
 }
 
 .suggestion-placeholder.current {
@@ -159,18 +153,22 @@ body {
 }
 
 .suggestion-placeholder:hover {
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.5);
 }
 
 /* Hide suggestions when there's input */
-.mood-input:not(:empty) ~ .suggestion-placeholder {
+.mood-input:not(:placeholder-shown) ~ .suggestion-placeholder {
   opacity: 0 !important;
   pointer-events: none;
 }
 
-/* Show suggestions when input is empty */
-.mood-input:empty ~ .suggestion-placeholder {
-  pointer-events: auto;
+/* Input container focus state */
+.input-container:focus-within .mood-input {
+  border-bottom-color: rgba(255,255,255,0.5);
+}
+
+.input-container:focus-within .suggestion-placeholder {
+  color: rgba(255,255,255,0.4);
 }
 
 /* Suggestion tags */

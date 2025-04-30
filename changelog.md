@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Dark, organic UI with animated geometric SVG background, Lato font, and animated prompt.
   - Mood input, flickering tag suggestions, and theme match display.
   - Integrated with FastAPI backend `/search` endpoint for live theme retrieval.
+- feat: Experimental smooth suggestions feature (experimental/smooth-suggestions-with-black-interface branch)
+  - Implemented smooth fade in/out transitions for mood suggestions
+  - Optimized timing for a more soothing user experience
+  - Isolated changes to prevent interference with core functionality
 
 ### Changed
 - Project structure updated to include frontend and backend directories, supporting full-stack development.
