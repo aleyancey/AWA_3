@@ -63,6 +63,7 @@ function App() {
       if (!resp.ok) throw new Error("Server error");
       const data = await resp.json();
       setThemes(data);
+      window.location.href = 'palette.html';
     } catch (err) {
       setError("Could not fetch themes. Try again.");
     } finally {
