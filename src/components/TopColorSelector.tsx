@@ -1,31 +1,31 @@
 import React from 'react';
 
-const COLORS = [
-  { name: 'Blue', value: 'neonBlue', border: '#00eaff' },
-  { name: 'Green', value: 'neonGreen', border: '#39ff14' },
-  { name: 'Purple', value: 'neonPurple', border: '#a259ff' },
-  { name: 'Yellow', value: 'neonYellow', border: '#fff700' },
-  { name: 'Neon Pink', value: 'neonPink', border: '#FF2079' },
-];
+export interface ColorOption {
+  id: string; // Unique identifier for the color (e.g., 'neonBlue' or a hex string '#RRGGBB')
+  name: string; // Display name (e.g., 'Blue' or the hex string)
+  displayBackground: string; // CSS value for background (e.g., 'var(--tw-color-neonBlue)' or a hex string)
+  borderColor: string; // CSS value for border color (hex string)
+}
 
 interface TopColorSelectorProps {
-  selectedColor: string;
-  onSelect: (color: string) => void;
+  colorOptions: ColorOption[];
+  selectedColor: string; // This will be the 'id' of the selected ColorOption
+  onSelect: (colorId: string) => void;
   brush?: 'color' | 'delay'; // for future extensibility
 }
 
-const TopColorSelector: React.FC<TopColorSelectorProps> = ({ selectedColor, onSelect, brush }) => (
+const TopColorSelector: React.FC<TopColorSelectorProps> = ({ colorOptions, selectedColor, onSelect, brush }) => (
   <div className="flex gap-6">
-    {COLORS.map((color) => (
+    {colorOptions.map((color) => (
       <button
-        key={color.value}
-        className={`w-10 h-10 rounded-full border-4 transition-all ${selectedColor === color.value && (!brush || brush === 'color') ? 'scale-110 shadow-lg' : ''}`}
+        key={color.id}
+        className={`w-10 h-10 rounded-full border-4 transition-all ${selectedColor === color.id && (!brush || brush === 'color') ? 'scale-110 shadow-lg' : ''}`}
         style={{
-          background: `var(--tw-color-${color.value})`,
-          borderColor: color.border,
-          boxShadow: selectedColor === color.value && (!brush || brush === 'color') ? `0 0 12px 4px ${color.border}` : undefined
+          background: color.displayBackground,
+          borderColor: color.borderColor,
+          boxShadow: selectedColor === color.id && (!brush || brush === 'color') ? `0 0 12px 4px ${color.borderColor}` : undefined
         }}
-        onClick={() => onSelect(color.value)}
+        onClick={() => onSelect(color.id)}
         aria-label={color.name}
       />
     ))}

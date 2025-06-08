@@ -63,12 +63,21 @@ function App() {
       if (!resp.ok) throw new Error("Server error");
       const data = await resp.json();
       setThemes(data);
-      window.location.href = 'palette.html';
     } catch (err) {
       setError("Could not fetch themes. Try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleThemeSelect = (selectedTheme) => {
+    const themeToStore = {
+      name: selectedTheme.name,
+      visual_palette: selectedTheme.visual_palette,
+      mood_tags: selectedTheme.mood_tags
+    };
+    localStorage.setItem('selectedTheme', JSON.stringify(themeToStore));
+    window.location.href = 'palette.html';
   };
 
   return (
@@ -114,7 +123,7 @@ function App() {
         {error && <div style={{ color: '#ffb4b4', marginTop: 10 }}>{error}</div>}
         <div className="themes">
           {themes.map(theme => (
-            <div className="theme-card" key={theme.id}>
+            <div className="theme-card" key={theme.id} onClick={() => handleThemeSelect(theme)} style={{ cursor: 'pointer' }}>
               <div className="theme-title">{theme.name}</div>
               <div className="theme-desc">{theme.description}</div>
               <div className="theme-tags">

@@ -309,10 +309,18 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth, brush = 'color
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const getHexColor = (colorValue: string) => {
+      if (colorValue.startsWith('#')) {
+        return colorValue;
+      }
+      return COLOR_MAP[colorValue] || '#ffffff'; // Default to white if lookup fails
+    };
+
     // Draw finished strokes as smooth, pressure-sensitive lines
     strokes.forEach((stroke) => {
       if (stroke.points.length < 2) return;
-      const neon = COLOR_MAP[stroke.color] || '#fff';
+      const neon = getHexColor(stroke.color); // Use new getter
       const N = stroke.points.length;
       const fadedIdx = Math.floor(N * stroke.fadeProgress);
       ctx.save();
@@ -360,7 +368,7 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth, brush = 'color
     });
     // Draw current stroke in progress (pressure-sensitive)
     if (isDrawing && currentStroke.length > 1) {
-      const neon = COLOR_MAP[color] || '#fff';
+      const neon = getHexColor(color); // Use new getter for current brush color
       ctx.save();
       ctx.shadowColor = neon;
       ctx.shadowBlur = 16;
@@ -397,18 +405,23 @@ const NeonCanvas: React.FC<NeonCanvasProps> = ({ color, penWidth, brush = 'color
   // Use up to 3 concurrent sounds
   const audioLayers = useRef<{ audio: HTMLAudioElement; timeout: number }[]>([]);
 
-  function playLayeredSound(color: string, dur: number) {
+  function playLayeredSound(strokeColor: string, dur: number) {
     // Map color to sound file
     const colorSoundMap: Record<string, string> = {
-      neonBlue: '/sounds/creek-neon-blue.mp3', // voice memo creek
-      neonGreen: '/sounds/gentle-creek.wav', // creek in rain forest
-      // Updated: neonPurple now uses trimmed thunderstorm
+      neonBlue: '/sounds/creek-neon-blue.mp3',
+      neonGreen: '/sounds/gentle-creek.wav',
       neonPurple: '/sounds/240871__timkahn__thunderstorm-trimmed.wav',
-      neonYellow: '/sounds/singing_bowl.wav', // singing bowl (was rain on leaves)
-      neonPink: '/sounds/wind_chimes_trimmed.wav', // wind chimes (trimmed, starts at 8s)
+      neonYellow: '/sounds/singing_bowl.wav',
+      neonPink: '/sounds/wind_chimes_trimmed.wav',
     };
 
-    const soundUrl = colorSoundMap[color] || '/sounds/gentle-rain.wav';
+    let soundUrl;
+    if (strokeColor.startsWith('#')) {
+      // For themed (hex) colors, pick a default or first available sound
+      soundUrl = '/sounds/gentle-creek.wav'; // Or Object.values(colorSoundMap)[0];
+    } else {
+      soundUrl = colorSoundMap[strokeColor] || '/sounds/gentle-rain.wav'; // Default for non-mapped named colors
+    }
 
     // --- Web Audio API approach for normalization ---
     // This loads the audio, analyzes RMS, and adjusts gain so all sounds play at a consistent loudness
