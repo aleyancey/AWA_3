@@ -18,6 +18,9 @@ const DEFAULT_COLOR_OPTIONS: ColorOption[] = [
 ];
 
 const App: React.FC = () => {
+  // DEBUG: This message helps verify if the App component is rendering at all.
+  // If you see this message in the browser, React is mounting the root component.
+
   const [phase, setPhase] = useState<Phase>('sound-select');
   const [selectedSounds, setSelectedSounds] = useState<string[]>([]);
   const [selectedColor, setSelectedColor] = useState<string>(DEFAULT_COLOR_OPTIONS[0].id); // Default to first default color's id
